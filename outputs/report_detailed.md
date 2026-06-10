@@ -193,6 +193,55 @@ Generated markdown summary with top 20 movies by rating count
 - [ ] **Rating bias analysis:** Quantify per-user and per-item rating bias distributions
 - [ ] **Temporal cold-start:** Track when movies entered the dataset; analyze early adoption patterns
 
+---
+
+### Advanced EDA Results (new)
+The advanced EDA script produced time-series, clustering, genre, bias, and cold-start analyses. Key results summary (full outputs in the `outputs/` folder):
+
+- **Temporal dynamics:** monthly average rating range 3.398 - 3.591; see [outputs/temporal_avg_rating_monthly.png](outputs/temporal_avg_rating_monthly.png) and [outputs/temporal_rating_counts_monthly.png](outputs/temporal_rating_counts_monthly.png).
+- **User segmentation:** 4 clusters discovered; cluster sizes saved in [outputs/user_cluster_summary.csv](outputs/user_cluster_summary.csv) and visualization at [outputs/user_cluster_sizes.png](outputs/user_cluster_sizes.png).
+- **Genre analysis:** Top genres by rating count — Drama (39895, mean=3.687), Comedy (29832, mean=3.394), Action (25589, mean=3.480), Thriller (21872, mean=3.509), Romance (19461, mean=3.622). See [outputs/genre_stats.csv](outputs/genre_stats.csv) and plots [outputs/genre_mean_ratings.png](outputs/genre_mean_ratings.png), [outputs/genre_counts.png](outputs/genre_counts.png).
+- **Rating bias:** per-user bias mean=0.058 (std=0.445), per-item bias mean=-0.454 (std=0.782). Histograms saved at [outputs/user_bias_hist.png](outputs/user_bias_hist.png) and [outputs/item_bias_hist.png](outputs/item_bias_hist.png).
+- **Temporal cold-start:** compared early (first 30 days) vs later ratings for movies; mean delta (early - later) ≈ 0.009 across movies with both periods. Details in [outputs/temporal_coldstart_compare_stats.csv](outputs/temporal_coldstart_compare_stats.csv) and [outputs/coldstart_delta_hist.png](outputs/coldstart_delta_hist.png).
+
+A machine-readable summary was also saved to [outputs/advanced_report.md](outputs/advanced_report.md).
+
+---
+
+### Detailed methods and rationale (Advanced EDA)
+
+Below are the exact actions performed for each advanced analysis, the outputs produced, and why each step is useful for understanding the dataset and informing next-stage modeling.
+
+1) Temporal dynamics
+- What I did: Converted the `timestamp` column to datetimes, resampled ratings by month, and computed monthly aggregates (count and mean). For high-activity items I computed per-month average ratings and plotted trajectories for the top-10 most-rated movies.
+- Files produced: `outputs/temporal_avg_rating_monthly.png`, `outputs/temporal_rating_counts_monthly.png`, `outputs/temporal_top10_movies.png`.
+- Why it's useful: Detects rating drift, seasonality, and bursts of activity. Temporal patterns indicate whether models should use time-aware splits (temporal holdout), incorporate time decay, or retrain frequently. The top-movie trajectories show whether popular items' perceived quality changes over time.
+
+2) User segmentation
+- What I did: Built per-user statistics (rating count, mean, std) and per-user genre-preference vectors by joining ratings with the movie genre flags from `u.item`. I reduced dimensionality with PCA and applied KMeans to find 4 clusters; cluster summaries and sizes were saved.
+- Files produced: `outputs/user_features.csv`, `outputs/user_cluster_summary.csv`, `outputs/user_cluster_sizes.png`.
+- Why it's useful: Segmentation reveals user cohorts (e.g., heavy raters, niche-genre preferrers) which helps tailor personalization strategies, choose weighting schemes, and design evaluation strata (test per-cluster performance). Clusters also identify super-users whose behavior can dominate learned item embeddings.
+
+3) Genre analysis
+- What I did: Merged ratings with item genre flags and aggregated rating counts and mean ratings per genre, then plotted mean rating and total rating counts per genre.
+- Files produced: `outputs/genre_stats.csv`, `outputs/genre_mean_ratings.png`, `outputs/genre_counts.png`.
+- Why it's useful: Genre-level signals are essential for cold-start recommendations and for hybrid models that combine content with collaborative signals. Observed differences in mean rating by genre inform whether to bias recommendations or tune model regularization per-genre.
+
+4) Rating bias analysis
+- What I did: Computed the global mean rating and then calculated per-user and per-item bias as (mean_rating - global_mean). Plotted histograms of these biases and saved descriptive statistics.
+- Files produced: `outputs/user_bias_hist.png`, `outputs/item_bias_hist.png`, `outputs/user_bias_stats.csv`, `outputs/item_bias_stats.csv`.
+- Why it's useful: Bias distributions reveal systematic tendencies: users who consistently rate high or low, and items that are consistently over- or under-rated. These biases are the basis of baseline models (global mean + user bias + item bias) and indicate how much regularization is required in factorization models.
+
+5) Temporal cold-start analysis
+- What I did: For each movie, found the first timestamp it received a rating, labeled ratings by days since that first rating, and compared the mean rating in the first 30 days (early) versus later. I computed per-movie deltas (early_mean - later_mean) and plotted the distribution.
+- Files produced: `outputs/movie_first_ratings.csv`, `outputs/temporal_coldstart_compare_stats.csv`, `outputs/coldstart_delta_hist.png`.
+- Why it's useful: Early-adopter bias (or novelty effects) can cause initial ratings to differ from later consensus. Quantifying this helps design evaluation windows (avoid optimistic early metrics), warm-up strategies for new items, and time-aware regularization.
+
+Reproducibility and next steps
+- The advanced EDA was implemented in `project2/scripts/advanced_eda.py`. Re-running that script regenerates all outputs in `outputs/`.
+- Next recommended steps: profile clusters with demographics and top genres, run temporal train/test splits for baseline models, and use genre features to bootstrap cold-start item profiles.
+
+
 ### **Phase 2: Recommender System Development**
 - [ ] **Baseline models:**
   - Global mean + user bias + item bias (biased MF)
