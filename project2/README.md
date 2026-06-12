@@ -46,5 +46,6 @@ Outputs:
 
 ### Day 2
 - Analyzed movie ratings
-- Identified top-rated movies using average ratings
-- Explored user-item interactions
+- Calculated average ratings per movie
+- Identified top-rated movies
+- Computed rating counts for each movie
