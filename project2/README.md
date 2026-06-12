@@ -36,3 +36,15 @@ Outputs:
 - `data/processed/ratings.csv` — cleaned ratings (normalized)
 - `data/processed/movies.csv` — movie metadata
 - `outputs/` — EDA plots and summaries
+
+## Week 2 Progress
+
+### Day 1
+- Loaded processed ratings and movies datasets
+- Checked dataset shape and missing values
+- Performed basic exploratory data analysis (EDA)
+
+### Day 2
+- Analyzed movie ratings
+- Identified top-rated movies using average ratings
+- Explored user-item interactions
