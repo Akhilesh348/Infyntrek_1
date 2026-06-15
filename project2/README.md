@@ -39,13 +39,27 @@ Outputs:
 
 ## Week 2 Progress
 
-### Day 1
+ Day 1
 - Loaded processed ratings and movies datasets
 - Checked dataset shape and missing values
 - Performed basic exploratory data analysis (EDA)
 
-### Day 2
+ Day 2
 - Analyzed movie ratings
 - Calculated average ratings per movie
 - Identified top-rated movies
 - Computed rating counts for each movie
+
+ Day 3
+- Implemented Item-Based Collaborative Filtering
+- Created a movie-user interaction matrix
+- Calculated cosine similarity between movies
+- Generated Top 5 similar movie recommendations
+- Displayed movie titles with similarity scores
+
+ Day 4
+- Implemented Singular Value Decomposition (SVD)
+- Created a user-movie rating matrix
+- Applied matrix factorization using TruncatedSVD
+- Reduced dimensionality of recommendation data
+- Evaluated explained variance captured by latent features
